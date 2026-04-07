@@ -94,6 +94,6 @@ The inference engine successfully identified **88%** of actual sick patients, es
 
 ## 🤝 Contributing
 Contributions, issues, and feature requests are welcome! 
-Feel free to check out the [issues page](https://github.com/alaamadii/diabetes-classification-xgboost/issues).
+
 
 
