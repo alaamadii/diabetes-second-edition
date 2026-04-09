@@ -95,7 +95,6 @@ The inference engine successfully identified **88%** of actual sick patients, es
 
 ## 🤝 Contributing
 Contributions, issues, and feature requests are welcome! 
-Feel free to check out the [issues page](https://github.com/yourusername/diabetes-classification-xgboost/issues).
 
-## 📝 License
-This project is open-source and available under the [MIT License](LICENSE).
+
+## ALAA MADI
