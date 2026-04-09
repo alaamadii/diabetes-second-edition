@@ -16,6 +16,7 @@ The model comes wrapped in a responsive **Streamlit** user interface allowing cl
 ## ✨ Features
 
 - **Large-Scale Medical Dataset:** Merged and normalized a massive 100k+ dataset incorporating features like `HbA1c`, `Smoking History`, and `Heart Disease`.
+- **Explainable AI (XAI):** Integrated SHAP (SHapley Additive exPlanations) to dynamically generate clinical Waterfall charts, entirely solving the "Black Box" problem by proving the mathematical logic behind every medical prediction.
 - **Advanced Imputation & Pipelines:** Seamless handling of missing clinical data points using standard ML pipelines.
 - **High-Recall XGBoost Architecture:** Applied a severe positive-class scaling weight (`10.49x`) directly inside the engine to ensure maximum sensitivity (88% Recall).
 - **Interactive Web Application:** A Streamlit-based UI that processes patient input arrays in real-time.
@@ -51,8 +52,8 @@ The model comes wrapped in a responsive **Streamlit** user interface allowing cl
 ### 1. Clone the Repository
 
 ```bash
-git clone https://github.com/yourusername/diabetes-classification-xgboost.git
-cd diabetes-classification-xgboost
+git clone https://github.com/alaamadii/diabetes-second-edition.git
+cd diabetes-second-edition
 ```
 
 ### 2. Install Dependencies
@@ -94,6 +95,7 @@ The inference engine successfully identified **88%** of actual sick patients, es
 
 ## 🤝 Contributing
 Contributions, issues, and feature requests are welcome! 
+Feel free to check out the [issues page](https://github.com/yourusername/diabetes-classification-xgboost/issues).
 
-
-
+## 📝 License
+This project is open-source and available under the [MIT License](LICENSE).
