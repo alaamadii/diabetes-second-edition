@@ -1,11 +1,6 @@
 [tool.ruff]
 target-version = "py310"
 line-length = 100
-extend-exclude = [
-    "notebooks/clean_data.py",
-    "notebooks/pipeline_and_evaluation.py",
-    "src/preprocessing.py",
-]
 
 [tool.ruff.lint]
 select = ["E", "F", "I", "UP", "B"]
