@@ -25,10 +25,7 @@ def load_assets():
 try:
     models = load_assets()
 except Exception as exc:
-    st.error(
-        "Could not load the trained model from the models directory. "
-        f"Details: {exc}"
-    )
+    st.error(f"Could not load the trained model from the models directory. Details: {exc}")
     models = {}
 
 if models:
@@ -54,9 +51,7 @@ if models:
             "Smoking History",
             options=["never", "No Info", "current", "former", "ever", "not current"],
         )
-        bmi = st.number_input(
-            "BMI", min_value=10.0, max_value=100.0, value=25.0, step=0.1
-        )
+        bmi = st.number_input("BMI", min_value=10.0, max_value=100.0, value=25.0, step=0.1)
 
     with col2:
         hba1c_level = st.number_input(
@@ -79,9 +74,7 @@ if models:
             value=20,
             step=1,
         )
-        insulin = st.number_input(
-            "Insulin Level", min_value=0, max_value=1000, value=79, step=1
-        )
+        insulin = st.number_input("Insulin Level", min_value=0, max_value=1000, value=79, step=1)
         dpf = st.number_input(
             "Diabetes Pedigree Function",
             min_value=0.0,
@@ -156,13 +149,10 @@ if models:
             try:
                 raw_names = preprocessor.get_feature_names_out()
                 feature_names = [
-                    name.split("__")[-1].replace("_", " ").title()
-                    for name in raw_names
+                    name.split("__")[-1].replace("_", " ").title() for name in raw_names
                 ]
             except Exception:
-                feature_names = [
-                    f"Feature {index}" for index in range(input_processed.shape[1])
-                ]
+                feature_names = [f"Feature {index}" for index in range(input_processed.shape[1])]
 
             explainer = shap.TreeExplainer(classifier)
             shap_values = explainer(input_processed)
