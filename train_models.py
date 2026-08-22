@@ -2,59 +2,22 @@ import os
 
 import joblib
 import pandas as pd
-from sklearn.compose import ColumnTransformer
-from sklearn.impute import SimpleImputer
-from sklearn.metrics import (
-    accuracy_score,
-    classification_report,
-    precision_score,
-    recall_score,
-    roc_auc_score,
-)
-from sklearn.model_selection import train_test_split
 from sklearn.pipeline import Pipeline
-from sklearn.preprocessing import OneHotEncoder, StandardScaler
 from xgboost import XGBClassifier
+
+from src.modeling import (
+    build_preprocessor,
+    compute_scale_pos_weight,
+    evaluate_binary_classifier,
+    split_features_target,
+)
 
 
 def prepare_data(data_path):
     print(f"Loading data from {data_path}...")
     df = pd.read_csv(data_path)
-
-    target_col = "diabetes"
-    X = df.drop(target_col, axis=1)
-    y = df[target_col]
-
-    categorical_cols = ["gender", "smoking_history"]
-    numeric_cols = [col for col in X.columns if col not in categorical_cols]
-
-    numeric_transformer = Pipeline(
-        steps=[
-            ("imputer", SimpleImputer(strategy="mean")),
-            ("scaler", StandardScaler()),
-        ]
-    )
-    categorical_transformer = Pipeline(
-        steps=[
-            ("imputer", SimpleImputer(strategy="most_frequent")),
-            ("onehot", OneHotEncoder(handle_unknown="ignore")),
-        ]
-    )
-
-    preprocessor = ColumnTransformer(
-        transformers=[
-            ("num", numeric_transformer, numeric_cols),
-            ("cat", categorical_transformer, categorical_cols),
-        ]
-    )
-
-    X_train, X_test, y_train, y_test = train_test_split(
-        X,
-        y,
-        test_size=0.2,
-        random_state=42,
-        stratify=y,
-    )
+    X_train, X_test, y_train, y_test = split_features_target(df)
+    preprocessor = build_preprocessor()
     return X_train, X_test, y_train, y_test, preprocessor
 
 
@@ -64,18 +27,21 @@ def train_and_evaluate(model, X_train, y_train, X_test, y_test, model_name):
 
     print(f"--- Evaluating {model_name} ---")
     y_pred = model.predict(X_test)
-
-    print(f"Accuracy: {accuracy_score(y_test, y_pred):.4f}")
-    print(f"Precision: {precision_score(y_test, y_pred, zero_division=0):.4f}")
-    print(f"Recall: {recall_score(y_test, y_pred, zero_division=0):.4f}")
-
+    y_score = None
     if hasattr(model, "predict_proba"):
-        scores = model.predict_proba(X_test)[:, 1]
-        print(f"ROC-AUC: {roc_auc_score(y_test, scores):.4f}")
+        y_score = model.predict_proba(X_test)[:, 1]
 
-    print("Classification Report:")
-    print(classification_report(y_test, y_pred, zero_division=0))
-    return model
+    metrics = evaluate_binary_classifier(y_test, y_pred, y_score)
+    print(f"Accuracy: {metrics.accuracy:.4f}")
+    print(f"Precision: {metrics.precision:.4f}")
+    print(f"Recall: {metrics.recall:.4f}")
+    print(f"Specificity: {metrics.specificity:.4f}")
+    if metrics.roc_auc is not None:
+        print(f"ROC-AUC: {metrics.roc_auc:.4f}")
+    if metrics.pr_auc is not None:
+        print(f"PR-AUC: {metrics.pr_auc:.4f}")
+
+    return model, metrics
 
 
 def main():
@@ -85,13 +51,11 @@ def main():
 
     try:
         X_train, X_test, y_train, y_test, preprocessor = prepare_data(data_file)
-    except FileNotFoundError:
-        print(f"Error: Data file not found at {data_file}")
+    except (FileNotFoundError, ValueError) as exc:
+        print(f"Could not prepare data: {exc}")
         return
 
-    pos_cases = y_train.sum()
-    neg_cases = len(y_train) - pos_cases
-    scale_pos = neg_cases / pos_cases if pos_cases > 0 else 1.0
+    scale_pos = compute_scale_pos_weight(y_train)
     print(f"Applying scale_pos_weight = {scale_pos:.2f} for XGBoost...")
 
     xgb_pipeline = Pipeline(
@@ -107,7 +71,7 @@ def main():
             ),
         ]
     )
-    xgb_pipeline = train_and_evaluate(
+    xgb_pipeline, _ = train_and_evaluate(
         xgb_pipeline,
         X_train,
         y_train,
