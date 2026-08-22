@@ -71,9 +71,7 @@ def split_features_target(
 
 
 def build_preprocessor() -> ColumnTransformer:
-    numeric_columns = [
-        column for column in FEATURE_COLUMNS if column not in CATEGORICAL_COLUMNS
-    ]
+    numeric_columns = [column for column in FEATURE_COLUMNS if column not in CATEGORICAL_COLUMNS]
 
     numeric_transformer = Pipeline(
         steps=[
